@@ -1,0 +1,11 @@
+services:
+	- App\Core\RouterFactory::createRouter
+	- App\Services\StackSwapService
+	- App\UI\Home\HomePresenter(%apiKey%)
+
+
+search:
+	-	in: %appDir%
+		classes:
+			- *Factory
+			- *Facade
