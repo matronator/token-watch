@@ -25,10 +25,10 @@ class StackSwapService
      */
     public function getAllPools(): array
     {
-        return $this->database->table('stackswap_pools')->fetchAll();
+        return $this->database->table('stackswap_pools')->order('liquidity_locked DESC, pair_name')->fetchAll();
     }
 
-    public function getPoolByIdentifier(int $identifier): mixed|ActiveRow|null
+    public function getPoolByIdentifier(string $identifier): ?ActiveRow
     {
         return $this->database->table('stackswap_pools')->where('identifier', $identifier)->fetch();
     }
@@ -48,8 +48,8 @@ class StackSwapService
                 $this->database->table('stackswap_pools')->insert([
                     'identifier' => $pool->identifier,
                     'pair_name' => $pool->pair_name,
-                    'token_address_x' => $pool->token_address_x,
-                    'token_address_y' => $pool->token_address_y,
+                    'token_address_x' => $pool->token_x_addr,
+                    'token_address_y' => $pool->token_y_addr,
                     'liquidity_token_addr' => $pool->liquidity_token_addr,
                     'liquidity_locked' => rtrim($pool->liquidity_locked, 'USD'),
                     'inserted_at' => new \DateTime(),
@@ -71,5 +71,10 @@ class StackSwapService
     public function getNewPoolsWithLiquidity(): array
     {
         return $this->getPools()->where('inserted_at > ?', new \DateTime('-2 day'))->where('liquidity_locked > 0')->order('inserted_at DESC, liquidity_locked DESC')->fetchAll();
+    }
+
+    public function getLastCollection(): ?ActiveRow
+    {
+        return $this->database->table('collections')->order('collected_at DESC')->fetch();
     }
 }

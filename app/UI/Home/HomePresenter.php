@@ -18,7 +18,8 @@ final class HomePresenter extends Nette\Application\UI\Presenter
     public function actionCollect(string $key): void
     {
         if ($key !== $this->apiKey) {
-            return $this->sendJson(['status' => 'error', 'message' => 'Invalid key']);
+            $this->sendJson(['status' => 'error', 'message' => 'Invalid key']);
+            return;
         }
 
         $this->stackSwapService->collect();
@@ -27,7 +28,14 @@ final class HomePresenter extends Nette\Application\UI\Presenter
 
     public function renderDefault(): void
     {
+        $collection = $this->stackSwapService->getLastCollection();
+        if ($collection) {
+            $this->template->collectedAt = $collection->collected_at;
+        } else {
+            $this->template->collectedAt = new \DateTime();
+        }
         $this->template->pools = $this->stackSwapService->getNewPools();
+        $this->template->allPools = $this->stackSwapService->getAllPools();
         $this->template->poolsWithLiquidity = $this->stackSwapService->getNewPoolsWithLiquidity();
     }
 }
