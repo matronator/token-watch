@@ -1,6 +1,7 @@
 services:
 	- App\Core\RouterFactory::createRouter
 	- App\Services\StackSwapService
+	- App\Services\HiroService(%hiroApi%)
 	- App\UI\Home\HomePresenter(%apiKey%)
 
 
