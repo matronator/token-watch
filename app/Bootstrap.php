@@ -24,7 +24,12 @@ class Bootstrap
 			->register();
 
 		$configurator->addConfig($appDir . '/config/common.neon');
-		$configurator->addConfig($appDir . '/config/common.local.neon');
+		if (file_exists($appDir . '/config/common.local.neon')) {
+			$configurator->addConfig($appDir . '/config/common.local.neon');
+		}
+		if (file_exists($appDir . '/config/common.prod.neon') && !$configurator->isDebugMode()) {
+			$configurator->addConfig($appDir . '/config/common.prod.neon');
+		}
 		$configurator->addConfig($appDir . '/config/services.neon');
 
 		return $configurator;

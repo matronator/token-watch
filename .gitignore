@@ -1,4 +1,5 @@
 *.local.neon
+*.prod.neon
 vendor
 temp/*
 log/*
