@@ -2,6 +2,7 @@ services:
 	- App\Core\RouterFactory::createRouter
 	- App\Services\StackSwapService
 	- App\Services\HiroService(%hiroApi%)
+	- App\Services\VelarService
 	- App\UI\Home\HomePresenter(%apiKey%)
 
 

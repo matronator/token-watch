@@ -6,12 +6,13 @@ namespace App\UI\Home;
 
 use App\Services\HiroService;
 use App\Services\StackSwapService;
+use App\Services\VelarService;
 use Nette;
 use Tracy\Debugger;
 
 final class HomePresenter extends Nette\Application\UI\Presenter
 {
-    public function __construct(public string $apiKey, public StackSwapService $stackSwapService, public HiroService $hiroService)
+    public function __construct(public string $apiKey, public StackSwapService $stackSwapService, public HiroService $hiroService, public VelarService $velarService)
     {
         parent::__construct();
     }
@@ -24,6 +25,7 @@ final class HomePresenter extends Nette\Application\UI\Presenter
         }
 
         $this->stackSwapService->collect();
+        $this->velarService->collect();
         $this->sendJson(['status' => 'ok']);
     }
 
@@ -35,13 +37,12 @@ final class HomePresenter extends Nette\Application\UI\Presenter
         } else {
             $this->template->collectedAt = new \DateTime();
         }
+
         $this->template->pools = $this->stackSwapService->getNewPools();
+        $this->template->tickers = $this->velarService->getNewTickers();
         $this->template->allPools = $this->stackSwapService->getAllPools();
+        $this->template->allTickers = $this->velarService->findAll()->fetchAll();
         $this->template->poolsWithLiquidity = $this->stackSwapService->getNewPoolsWithLiquidity();
-
-        $contractInfo = $this->hiroService->getContractInfo('SPA0SZQ6KCCYMJV5XVKSNM7Y1DGDXH39A11ZX2Y8.gamestop');
-        Debugger::barDump(json_decode($contractInfo['abi']));
-
-        $this->template->contractInfo = $contractInfo;
+        $this->template->tickersWithLiquidity = $this->velarService->getNewTickersWithLiquidity();
     }
 }
