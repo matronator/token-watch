@@ -1,0 +1,36 @@
+{varType string $dex}
+{varType array $tokens}
+{varType array $tokensWithLiquidity}
+{varType array $all}
+{varType string|\DateTime $collectedAt}
+
+<nav>
+    <div class="nav nav-tabs" id="nav-tab-{$dex}" role="tablist">
+        <button class="nav-link active" id="new-pools-{$dex}-tab" data-bs-toggle="tab" data-bs-target="#new-pools-{$dex}" type="button" role="tab" aria-controls="new-pools-{$dex}" aria-selected="true">New pools</button>
+        <button class="nav-link" id="with-liquidity-{$dex}-tab" data-bs-toggle="tab" data-bs-target="#with-liquidity-{$dex}" type="button" role="tab" aria-controls="with-liquidity-{$dex}" aria-selected="false">New pools with liquidity</button>
+        <button class="nav-link" id="all-pools-{$dex}-tab" data-bs-toggle="tab" data-bs-target="#all-pools-{$dex}" type="button" role="tab" aria-controls="all-pools-{$dex}" aria-selected="false">All pools</button>
+    </div>
+</nav>
+<div class="tab-content" id="nav-tabContent-{$dex}">
+    <div class="tab-pane fade show active" id="new-pools-{$dex}" role="tabpanel" aria-labelledby="new-pools-{$dex}-tab" tabindex="0">
+        {if $dex === 'Velar'}
+            {include '../Components/_tickers.latte', title: 'Latest tickers', tickers: $tokens, collectedAt: $collectedAt}
+        {else}
+            {include '../Components/_pools.latte', title: 'Latest pools', pools: $tokens, collectedAt: $collectedAt}
+        {/if}
+    </div>
+    <div class="tab-pane fade" id="with-liquidity-{$dex}" role="tabpanel" aria-labelledby="with-liquidity-{$dex}-tab" tabindex="0">
+        {if $dex === 'Velar'}
+            {include '../Components/_tickers.latte', title: 'Latest tickers', tickers: $tickersWithLiquidity, collectedAt: $collectedAt}
+        {else}
+            {include '../Components/_pools.latte', title: 'Latest pools', pools: $poolsWithLiquidity, collectedAt: $collectedAt}
+        {/if}
+    </div>
+    <div class="tab-pane fade" id="all-pools-{$dex}" role="tabpanel" aria-labelledby="all-pools-{$dex}-tab" tabindex="0">
+        {if $dex === 'Velar'}
+            {include '../Components/_tickers.latte', title: 'Latest tickers', tickers: $all, collectedAt: $collectedAt}
+        {else}
+            {include '../Components/_pools.latte', title: 'Latest pools', pools: $all, collectedAt: $collectedAt}
+        {/if}
+    </div>
+</div>

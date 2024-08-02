@@ -60,6 +60,7 @@ class StackSwapService
         $this->database->table('collections')->insert([
             'collected_at' => new \DateTime(),
             'new_pools' => $newPools,
+            'dex' => 'stackswap',
         ]);
     }
 
@@ -75,6 +76,6 @@ class StackSwapService
 
     public function getLastCollection(): ?ActiveRow
     {
-        return $this->database->table('collections')->order('collected_at DESC')->fetch();
+        return $this->database->table('collections')->where('dex', 'stackswap')->order('collected_at DESC')->fetch();
     }
 }

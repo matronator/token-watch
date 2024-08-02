@@ -21,7 +21,7 @@ class HiroService
 
         $name = '';
         try {
-            $name = json_decode($contractInfo['abi'])[0]->name;
+            $name = json_decode($contractInfo['abi'], true)[0]['name'] ?? 'Unknown';
         } catch (\Exception $e) {
             Debugger::log($e, Debugger::EXCEPTION);
             $name = 'Unknown';
