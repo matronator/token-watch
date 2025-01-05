@@ -5,11 +5,16 @@
     </div>
     <div class="card-body">
         {foreach $tickers as $ticker}
-            <div>
-                <h3>{$ticker->target_token_name} ({$ticker->target_token_symbol})</h3>
-                <p>Pair name: {$ticker->ticker_id}</p>
-                <p>Liquidity: {$ticker->liquidity_in_usd|number:4,'.',' '} USD</p>
-                <p>Date added: {$ticker->inserted_at|date:'Y-m-d H:i:s'}</p>
+            <div class="row">
+                <div class="col-2">
+                    <img class="img-fluid" src="{$ticker->velar_token->image_url ?? 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/660px-No-Image-Placeholder.svg.png?20200912122019'}" alt="{$ticker->target_token_name}">
+                </div>
+                <div class="col-10">
+                    <h3>{$ticker->target_token_name} ({$ticker->target_token_symbol})</h3>
+                    <p>Pair name: {$ticker->ticker_id}</p>
+                    <p>Liquidity: {$ticker->liquidity_in_usd|number:4,'.',' '} USD</p>
+                    <p>Date added: {$ticker->inserted_at|date:'Y-m-d H:i:s'}</p>
+                </div>
             </div>
         {else}
             <div class="card">

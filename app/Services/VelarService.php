@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use Nette\Database\Explorer;
 use Nette\Database\Table\ActiveRow;
 use Nette\Database\Table\Selection;
+use Tracy\Debugger;
 
 class VelarService
 {
@@ -44,53 +45,59 @@ class VelarService
 
     public function collect()
     {
-        $tickers = $this->loadTickers();
-        $tokens = $this->loadTokens();
+        try {
+            $tickers = $this->loadTickers();
+            $tokens = $this->loadTokens();
 
-        $newTokens = 0;
-        foreach ($tokens as $token) {
-            $savedToken = $this->getTokenByAddress($token['contractAddress']);
-            if (!$savedToken) {
-                $newTokens++;
-                $this->database->table('velar_tokens')->insert([
-                    'contract_address' => $token['contractAddress'],
-                    'name' => $token['name'],
-                    'symbol' => $token['symbol'],
-                    'price' => $token['price'],
-                    'image_url' => $token['imageUrl'],
-                    'asset_name' => $token['assetName'],
-                    'social_links' => json_encode($token['socialLinks']),
-                    'inserted_at' => new \DateTime(),
-                ]);
-            } else {
-                $savedToken->update([
-                    'price' => $token['price'],
-                    'updated_at' => new \DateTime(),
-                ]);
+            $newTokens = 0;
+            foreach ($tokens as $token) {
+                $savedToken = $this->getTokenByAddress($token['contractAddress']);
+                if (!$savedToken) {
+                    $newTokens++;
+                    $this->database->table('velar_tokens')->insert([
+                        'contract_address' => $token['contractAddress'],
+                        'name' => $token['name'],
+                        'symbol' => $token['symbol'],
+                        'price' => $token['price'],
+                        'image_url' => $token['imageUrl'],
+                        'asset_name' => $token['assetName'],
+                        'social_links' => json_encode($token['socialLinks']),
+                        'inserted_at' => new \DateTime(),
+                    ]);
+                } else {
+                    $savedToken->update([
+                        'price' => $token['price'],
+                        'updated_at' => new \DateTime(),
+                    ]);
+                }
             }
-        }
 
-        $newTicker = 0;
-        foreach ($tickers as $ticker) {
-            $savedTicker = $this->saveTicker($ticker);
-            if (!$savedTicker) {
-                $newTicker++;
+            $newTicker = 0;
+            foreach ($tickers as $ticker) {
+                $savedTicker = $this->saveTicker($ticker);
+                if (!$savedTicker) {
+                    $newTicker++;
+                }
             }
-        }
 
-        $this->findAllCollections()->insert([
-            'collected_at' => new \DateTime(),
-            'new_pools' => $newTicker + $newTokens,
-            'dex' => 'velar',
-        ]);
+            $this->findAllCollections()->insert([
+                'collected_at' => new \DateTime(),
+                'new_pools' => $newTicker + $newTokens,
+                'dex' => 'velar',
+            ]);
+        } catch (\Exception $e) {
+            Debugger::log($e);
+        }
     }
 
     public function saveTicker(array $ticker): bool
     {
+        $velarToken = $this->findAllTokens()->where('contract_address', $ticker['target_currency'])->fetch();
         if ($this->getTickerById($ticker['ticker_id'])) {
             $this->findAll()->where('ticker_id', $ticker['ticker_id'])->update([
                 'liquidity_in_usd' => $ticker['liquidity_in_usd'],
                 'base_volume' => $ticker['base_volume'],
+                'velar_token_id' => ($velarToken !== null) ? $velarToken->id : null,
                 'target_volume' => $ticker['target_volume'],
                 'last_price' => $ticker['last_price'],
                 'updated_at' => new \DateTime(),
@@ -109,6 +116,7 @@ class VelarService
 
         $this->database->table('velar_tickers')->insert([
             'ticker_id' => $ticker['ticker_id'],
+            'velar_token_id' => ($velarToken !== null) ? $velarToken->id : null,
             'base_currency' => $ticker['base_currency'],
             'target_currency' => $ticker['target_currency'],
             'pool_id' => $ticker['pool_id'],

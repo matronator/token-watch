@@ -8,6 +8,7 @@ use GuzzleHttp\Client;
 use Nette\Database\Explorer;
 use Nette\Database\Table\ActiveRow;
 use Nette\Database\Table\Selection;
+use Tracy\Debugger;
 
 class StackSwapService
 {
@@ -36,32 +37,36 @@ class StackSwapService
     public function collect()
     {
         $client = new Client();
-        $res = $client->request('GET', 'https://app.stackswap.org/api/v1/pools');
-        $pools = json_decode($res->getBody()->getContents());
+        try {
+            $res = $client->request('GET', 'https://app.stackswap.org/api/v1/pools');
+            $pools = json_decode($res->getBody()->getContents());
 
-        $newPools = 0;
+            $newPools = 0;
 
-        foreach ($pools as $pool) {
-            $savedPool = $this->getPoolByIdentifier($pool->identifier);
-            if (!$savedPool) {
-                $newPools++;
-                $this->database->table('stackswap_pools')->insert([
-                    'identifier' => $pool->identifier,
-                    'pair_name' => $pool->pair_name,
-                    'token_address_x' => $pool->token_x_addr,
-                    'token_address_y' => $pool->token_y_addr,
-                    'liquidity_token_addr' => $pool->liquidity_token_addr,
-                    'liquidity_locked' => rtrim($pool->liquidity_locked, 'USD'),
-                    'inserted_at' => new \DateTime(),
-                ]);
+            foreach ($pools as $pool) {
+                $savedPool = $this->getPoolByIdentifier($pool->identifier);
+                if (!$savedPool) {
+                    $newPools++;
+                    $this->database->table('stackswap_pools')->insert([
+                        'identifier' => $pool->identifier,
+                        'pair_name' => $pool->pair_name,
+                        'token_address_x' => $pool->token_x_addr,
+                        'token_address_y' => $pool->token_y_addr,
+                        'liquidity_token_addr' => $pool->liquidity_token_addr,
+                        'liquidity_locked' => rtrim($pool->liquidity_locked, 'USD'),
+                        'inserted_at' => new \DateTime(),
+                    ]);
+                }
             }
-        }
 
-        $this->database->table('collections')->insert([
-            'collected_at' => new \DateTime(),
-            'new_pools' => $newPools,
-            'dex' => 'stackswap',
-        ]);
+            $this->database->table('collections')->insert([
+                'collected_at' => new \DateTime(),
+                'new_pools' => $newPools,
+                'dex' => 'stackswap',
+            ]);
+        } catch (\Exception $e) {
+            Debugger::log($e);
+        }
     }
 
     public function getNewPools(): array
