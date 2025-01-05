@@ -3,15 +3,16 @@
 <div id="content">
 	<nav>
 		<div class="nav nav-pills nav-fill justify-content-between" id="nav-dex" role="tablist">
-			<button class="nav-link active" id="stackswap-tab" data-bs-toggle="tab" data-bs-target="#stackswap" type="button" role="tab" aria-controls="stackswap" aria-selected="true">StackSwap</button>
-			<button class="nav-link" id="velar-tab" data-bs-toggle="tab" data-bs-target="#velar" type="button" role="tab" aria-controls="velar" aria-selected="false">Velar</button>
+			<button class="nav-link disabled" id="stackswap-tab" data-bs-toggle="tab" data-bs-target="#stackswap" type="button" role="tab" aria-controls="stackswap" aria-selected="true">StackSwap (N/A)</button>
+			<button class="nav-link active" id="velar-tab" data-bs-toggle="tab" data-bs-target="#velar" type="button" role="tab" aria-controls="velar" aria-selected="false">Velar</button>
 		</div>
 	</nav>
 	<div class="tab-content" id="nav-dexContent">
-		<div class="tab-pane fade show active" id="stackswap" role="tabpanel" aria-labelledby="stackswap-tab" tabindex="0">
-			{include '../Components/_tokenTabs.latte', dex: 'StackSwap', tokens: $pools, tokensWIthLiquidity: $poolsWithLiquidity, all: $allPools, collectedAt: $collectedAt}
+		<div class="tab-pane fade text-center pt-4" id="stackswap" role="tabpanel" aria-labelledby="stackswap-tab" tabindex="0">
+			{* {include '../Components/_tokenTabs.latte', dex: 'StackSwap', tokens: $pools, tokensWIthLiquidity: $poolsWithLiquidity, all: $allPools, collectedAt: $collectedAt} *}
+			<h3>Temporarily unavailable</h3>
 		</div>
-		<div class="tab-pane fade" id="velar" role="tabpanel" aria-labelledby="velar-tab" tabindex="0">
+		<div class="tab-pane fade show active" id="velar" role="tabpanel" aria-labelledby="velar-tab" tabindex="0">
 			{include '../Components/_tokenTabs.latte', dex: 'Velar', tokens: $tickers, tokensWIthLiquidity: $tickersWithLiquidity, all: $allTickers, collectedAt: $collectedAt}
 		</div>
 	</div>

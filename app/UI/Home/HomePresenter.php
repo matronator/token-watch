@@ -24,7 +24,7 @@ final class HomePresenter extends Nette\Application\UI\Presenter
             return;
         }
 
-        $this->stackSwapService->collect();
+        // $this->stackSwapService->collect(); // temporarily unavailable
         $this->velarService->collect();
         $this->sendJson(['status' => 'ok']);
     }
